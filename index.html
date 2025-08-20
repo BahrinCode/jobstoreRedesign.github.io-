@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jobstore – Redesign Prototype</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind config for brand tokens
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
+            },
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Scrollbar and focus polish */
+    * { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+    *::-webkit-scrollbar { height: 10px; width: 10px; }
+    *::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    .focus-ring { outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,.35); }
+    /* Slide-over animation */
+    .slide-enter { transform: translateX(100%); opacity: 0; }
+    .slide-enter-active { transform: translateX(0); opacity: 1; transition: all .25s ease; }
+    .slide-exit { transform: translateX(0); opacity: 1; }
+    .slide-exit-active { transform: translateX(100%); opacity: 0; transition: all .2s ease; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-4">
+      <a href="#" class="flex items-center gap-2" aria-label="Jobstore Home" onclick="App.show('home')">
+        <div class="h-20 w-40  bg-brand-0 text-white grid place-items-center font-bold">
+            <img src="https://assets.jobstore.my/images/branding/jobstore_logo_blue.png" alt="">
+        </div>
+        <span class="font-semibold tracking-tight text-lg"></span>
+      </a>
+      <nav class="ml-auto hidden md:flex items-center gap-1" aria-label="Main">
+        <button class="px-3 py-2 rounded-xl hover:bg-slate-100" onclick="App.show('home')">Find Jobs</button>
+        <button class="px-3 py-2 rounded-xl hover:bg-slate-100" onclick="App.show('results')">Search</button>
+        <button class="px-3 py-2 rounded-xl hover:bg-slate-100" onclick="App.show('employers')">For Employers</button>
+        <button class="px-3 py-2 rounded-xl hover:bg-slate-100" onclick="App.show('pricing')">Pricing</button>
+        <button class="px-3 py-2 rounded-xl hover:bg-slate-100" onclick="App.show('saved')">Saved</button>
+      </nav>
+      <div class="ml-auto md:ml-2 flex items-center gap-2">
+        <button id="signinBtn" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-100">Sign in</button>
+        <button class="px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700" onclick="App.show('employers')">Post a Job</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main id="app" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
+
+    <!-- HOME / JOBSEEKER LANDING -->
+    <section id="view-home" class="space-y-8">
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div class="space-y-5">
+          <h1 class="text-4xl md:text-5xl font-bold leading-tight">Find work you'll love.</h1>
+          <p class="text-slate-600 text-lg">50,000+ roles across Malaysia & SEA. Search fast, apply faster.</p>
+          <!-- Search Bar -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+            <form id="searchFormHome" class="flex flex-col md:flex-row gap-3" onsubmit="App.search(event)">
+              <div class="flex-1 relative">
+                <input id="q" name="q" type="text" class="w-full h-12 rounded-xl border border-slate-200 pl-11 pr-4" placeholder="Job title, keyword (e.g., \"Admin\")" />
+                <i data-lucide="search" class="absolute left-3 top-3.5 h-5 w-5 text-slate-400"></i>
+              </div>
+              <div class="md:w-64 relative">
+                <input id="loc" name="loc" type="text" class="w-full h-12 rounded-xl border border-slate-200 pl-11 pr-4" placeholder="Location (e.g., Kuala Lumpur)" />
+                <i data-lucide="map-pin" class="absolute left-3 top-3.5 h-5 w-5 text-slate-400"></i>
+              </div>
+              <button class="h-12 rounded-xl bg-brand-600 text-white px-6 hover:bg-brand-700">Search</button>
+            </form>
+            <!-- Popular chips -->
+            <div class="flex flex-wrap gap-2 mt-3">
+              <button class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm" onclick="App.quick('Admin')">Admin</button>
+              <button class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm" onclick="App.quick('Retail')">Retail</button>
+              <button class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm" onclick="App.quick('IT Support')">IT Support</button>
+              <button class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm" onclick="App.quick('Accountant')">Accountant</button>
+              <button class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm" onclick="App.quick('Graphic Designer')">Graphic Designer</button>
+            </div>
+          </div>
+        </div>
+        <div class="relative">
+          <div class="rounded-3xl bg-gradient-to-br from-brand-600 to-brand-800 p-1">
+            <div class="rounded-3xl bg-white p-6">
+              <div class="flex items-center gap-3">
+                <div class="h-12 w-12 rounded-2xl bg-slate-900 text-white grid place-items-center font-bold">MY</div>
+                <div>
+                  <p class="text-slate-500 text-sm">Trending near you</p>
+                  <p class="font-semibold">Fresh roles today</p>
+                </div>
+              </div>
+              <ul id="freshList" class="mt-4 space-y-3 text-sm"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collections -->
+      <section aria-labelledby="collections" class="space-y-4">
+        <h2 id="collections" class="text-xl font-semibold">Explore collections</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button class="group p-5 rounded-2xl border border-slate-200 bg-white hover:shadow-md text-left" onclick="App.filterTag('Remote')">
+            <div class="flex items-center justify-between">
+              <span class="font-semibold">Remote-friendly</span>
+              <i data-lucide="wifi" class="h-5 w-5 text-slate-400 group-hover:text-brand-600"></i>
+            </div>
+            <p class="text-slate-600 text-sm mt-1">Work from anywhere roles</p>
+          </button>
+          <button class="group p-5 rounded-2xl border border-slate-200 bg-white hover:shadow-md text-left" onclick="App.filterTag('Fresh Grad')">
+            <div class="flex items-center justify-between">
+              <span class="font-semibold">Fresh Graduates</span>
+              <i data-lucide="graduation-cap" class="h-5 w-5 text-slate-400 group-hover:text-brand-600"></i>
+            </div>
+            <p class="text-slate-600 text-sm mt-1">Entry-level opportunities</p>
+          </button>
+          <button class="group p-5 rounded-2xl border border-slate-200 bg-white hover:shadow-md text-left" onclick="App.filterTag('Part-time')">
+            <div class="flex items-center justify-between">
+              <span class="font-semibold">Part-time & Shift</span>
+              <i data-lucide="clock" class="h-5 w-5 text-slate-400 group-hover:text-brand-600"></i>
+            </div>
+            <p class="text-slate-600 text-sm mt-1">Flexible schedules</p>
+          </button>
+          <button class="group p-5 rounded-2xl border border-slate-200 bg-white hover:shadow-md text-left" onclick="App.filterTag('High Salary')">
+            <div class="flex items-center justify-between">
+              <span class="font-semibold">High Salary</span>
+              <i data-lucide="badge-dollar-sign" class="h-5 w-5 text-slate-400 group-hover:text-brand-600"></i>
+            </div>
+            <p class="text-slate-600 text-sm mt-1">Top-paying jobs</p>
+          </button>
+        </div>
+      </section>
+
+      <section aria-labelledby="blog" class="py-4 relative ">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 class="font-manrope text-4xl font-bold text-gray-900 text-center mb-16">Our latest  blog</h2>
+          <div class="flex justify-center  gap-y-8 lg:gap-y-0 flex-wrap md:flex-wrap lg:flex-nowrap lg:flex-row lg:justify-between lg:gap-x-8">
+             <div class="group w-full max-lg:max-w-xl lg:w-1/3 border border-gray-300 rounded-2xl">
+              <div class="flex items-center">
+                  <img src="https://s3-ap-southeast-1.amazonaws.com/jobstoreblog/wp-content/uploads/2025/08/15141658/HQ090924GG00-18_4_1749195913-850x550.png" alt="blogs tailwind section" class="rounded-t-2xl w-full object-cover">
+              </div>
+              <div class="p-4 lg:p-6 transition-all duration-300 rounded-b-2xl group-hover:bg-gray-50">
+                  <span class="text-indigo-600 font-medium mb-3 block">Jan 01, 2023</span>
+                  <h4 class="text-xl text-gray-900 font-medium leading-8 mb-5">Pekerja PETRONAS Dibuang Kerja Disebabkan Faktor AI & Teknologi Baharu</h4>
+                  <p class="text-gray-500 leading-6 mb-10"></p>
+                  <a href="javascript:;" class="cursor-pointer text-lg text-indigo-600 font-semibold">Read more..</a>
+              </div>
+             </div>
+             <div class="group w-full max-lg:max-w-xl lg:w-1/3 border border-gray-300 rounded-2xl">
+              <div class="flex items-center">
+                  <img src="https://s3-ap-southeast-1.amazonaws.com/jobstoreblog/wp-content/uploads/2025/08/12150408/250811-nurAI-AI-deepseek-2-1024x724-1-850x550.jpg" alt="blogs tailwind section" class="rounded-t-2xl w-full object-cover">
+              </div>
+              <div class="p-4 lg:p-6 transition-all duration-300 rounded-b-2xl group-hover:bg-gray-50">
+                  <span class="text-indigo-600 font-medium mb-3 block">Feb 01, 2023</span>
+                  <h4 class="text-xl text-gray-900 font-medium leading-8 mb-5">NurAI Rasmi Dilancarkan, Inovasi Digital Jawab Soalan Agama Islam</h4>
+                  <p class="text-gray-500 leading-6 mb-10"></p>
+                  <a href="javascript:;" class="cursor-pointer text-lg text-indigo-600 font-semibold">Read more..</a>
+              </div>
+             </div>
+             <div class="group w-full max-lg:max-w-xl lg:w-1/3 border border-gray-300 rounded-2xl">
+              <div class="flex items-center">
+                  <img src="https://s3-ap-southeast-1.amazonaws.com/jobstoreblog/wp-content/uploads/2025/08/08142617/1945676-untitled-design-2-850x550.png" alt="blogs tailwind section" class="rounded-t-2xl w-full object-cover">
+              </div>
+              <div class="p-4 lg:p-6 transition-all duration-300 rounded-b-2xl group-hover:bg-gray-50">
+                  <span class="text-indigo-600 font-medium mb-3 block">Mar 01, 20233</span>
+                  <h4 class="text-xl text-gray-900 font-medium leading-8 mb-5">Donald Trump Paksa CEO Baru Intel Letak Jawatan</h4>
+                  <p class="text-gray-500 leading-6 mb-10"></p>
+                  <a href="javascript:;" class="cursor-pointer text-lg text-indigo-600 font-semibold">Read more..</a>
+              </div>
+             </div>
+             
+          </div>
+        </div>
+    </section>
+
+    </section>
+
+    
+                                            
+
+ 
+
+    <!-- RESULTS -->
+    <section id="view-results" class="hidden">
+      <div class="grid lg:grid-cols-[280px,1fr] gap-6">
+        <!-- Filters -->
+        <aside class="space-y-5">
+          <div class="p-4 bg-white rounded-2xl border border-slate-200">
+            <h3 class="font-semibold">Filters</h3>
+            <div class="mt-3 space-y-3 text-sm">
+              <div>
+                <label class="block text-slate-600 mb-1">Job Type</label>
+                <div class="flex flex-wrap gap-2" id="typeFilters"></div>
+              </div>
+              <div>
+                <label class="block text-slate-600 mb-1">Experience</label>
+                <div class="flex flex-wrap gap-2" id="expFilters"></div>
+              </div>
+              <div>
+                <label class="block text-slate-600 mb-1">Posted</label>
+                <select id="postedFilter" class="w-full h-10 rounded-lg border border-slate-200">
+                  <option value="">Any time</option>
+                  <option value="1">Last 24 hours</option>
+                  <option value="3">Last 3 days</option>
+                  <option value="7">Last 7 days</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-600 mb-1">Salary (MYR)</label>
+                <input id="salaryMin" type="number" class="w-full h-10 rounded-lg border border-slate-200" placeholder="Min" />
+                <input id="salaryMax" type="number" class="w-full h-10 rounded-lg border border-slate-200 mt-2" placeholder="Max" />
+              </div>
+              <button class="w-full h-10 rounded-lg bg-slate-900 text-white" onclick="App.applyFilters()">Apply</button>
+              <button class="w-full h-10 rounded-lg border border-slate-200" onclick="App.resetFilters()">Reset</button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Results List -->
+        <section>
+          <div class="flex flex-wrap items-center gap-3 mb-4">
+            <h2 id="resultsTitle" class="text-xl font-semibold">Search results</h2>
+            <span id="resultsCount" class="text-slate-600"></span>
+            <div class="ml-auto">
+              <label class="sr-only" for="sort">Sort</label>
+              <select id="sort" class="h-10 rounded-lg border border-slate-200" onchange="App.renderResults()">
+                <option value="relevance">Relevant</option>
+                <option value="newest">Newest</option>
+                <option value="salary-desc">Salary (high → low)</option>
+                <option value="salary-asc">Salary (low → high)</option>
+              </select>
+            </div>
+          </div>
+          <div id="resultsList" class="grid gap-3"></div>
+          <div class="flex justify-between items-center mt-4">
+            <button class="px-3 py-2 rounded-lg border border-slate-200" onclick="App.prevPage()">Previous</button>
+            <div id="pageInfo" class="text-sm text-slate-600"></div>
+            <button class="px-3 py-2 rounded-lg border border-slate-200" onclick="App.nextPage()">Next</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- SAVED -->
+    <section id="view-saved" class="hidden">
+      <h2 class="text-xl font-semibold mb-3">Saved jobs</h2>
+      <div id="savedList" class="grid gap-3"></div>
+      <p id="savedEmpty" class="text-slate-600">You haven't saved any jobs yet.</p>
+    </section>
+
+    <!-- EMPLOYER LANDING -->
+    <section id="view-employers" class="hidden space-y-8">
+      <div class="rounded-3xl p-8 bg-gradient-to-r from-brand-600 to-brand-800 text-white">
+        <h2 class="text-3xl font-bold">Post once, reach everywhere</h2>
+        <p class="mt-2 text-white/90">Distribute to 50+ job boards & social channels. Start hiring in minutes.</p>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <button class="px-4 py-2 rounded-xl bg-white text-slate-900" onclick="App.show('pricing')">View Pricing</button>
+          <button class="px-4 py-2 rounded-xl border border-white/40" onclick="App.openPostJob()">Post a Job</button>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="p-5 bg-white rounded-2xl border border-slate-200">
+          <div class="flex items-center gap-2">
+            <i data-lucide="rocket" class="h-5 w-5 text-brand-600"></i>
+            <h3 class="font-semibold">Faster reach</h3>
+          </div>
+          <p class="text-slate-600 mt-2 text-sm">Syndication + boosts put your role in front of the right talent quickly.</p>
+        </div>
+        <div class="p-5 bg-white rounded-2xl border border-slate-200">
+          <div class="flex items-center gap-2">
+            <i data-lucide="target" class="h-5 w-5 text-brand-600"></i>
+            <h3 class="font-semibold">Better matches</h3>
+          </div>
+          <p class="text-slate-600 mt-2 text-sm">Screening questions and a quality score improve applicant fit.</p>
+        </div>
+        <div class="p-5 bg-white rounded-2xl border border-slate-200">
+          <div class="flex items-center gap-2">
+            <i data-lucide="shield-check" class="h-5 w-5 text-brand-600"></i>
+            <h3 class="font-semibold">Trust & support</h3>
+          </div>
+          <p class="text-slate-600 mt-2 text-sm">Live chat and local support across MY, SG, HK, PH, ID, AU.</p>
+        </div>
+      </div>
+      <div class="p-5 bg-white rounded-2xl border border-slate-200">
+        <h3 class="font-semibold">Distribution partners</h3>
+        <div class="mt-3 grid grid-cols-3 sm:grid-cols-6 gap-3 text-center text-sm text-slate-600">
+          <div class="p-3 rounded-xl border">Indeed</div>
+          <div class="p-3 rounded-xl border">LinkedIn</div>
+          <div class="p-3 rounded-xl border">Google Jobs</div>
+          <div class="p-3 rounded-xl border">Facebook</div>
+          <div class="p-3 rounded-xl border"> Jooble</div>
+          <div class="p-3 rounded-xl border"> Jobstreet*</div>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">*For illustration only in this prototype.</p>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="view-pricing" class="hidden">
+      <h2 class="text-2xl font-bold mb-4">Simple pricing</h2>
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="p-5 bg-white rounded-2xl border border-slate-200 flex flex-col">
+          <h3 class="font-semibold">Basic</h3>
+          <p class="text-slate-600 text-sm">1 role · 14 days</p>
+          <p class="text-3xl font-bold mt-3">RM 149</p>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2">
+            <li>Standard distribution</li><li>Email support</li></ul>
+          <button class="mt-auto px-4 py-2 rounded-xl bg-slate-900 text-white" onclick="App.openPostJob('Basic')">Get started</button>
+        </div>
+        <div class="p-5 bg-white rounded-2xl border border-slate-200 flex flex-col ring-2 ring-brand-600">
+          <h3 class="font-semibold">Standard</h3>
+          <p class="text-slate-600 text-sm">3 roles · 30 days</p>
+          <p class="text-3xl font-bold mt-3">RM 399</p>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2">
+            <li>Wider distribution</li><li>1 sponsored boost</li><li>Chat support</li></ul>
+          <button class="mt-auto px-4 py-2 rounded-xl bg-brand-600 text-white" onclick="App.openPostJob('Standard')">Choose plan</button>
+        </div>
+        <div class="p-5 bg-white rounded-2xl border border-slate-200 flex flex-col">
+          <h3 class="font-semibold">Pro</h3>
+          <p class="text-slate-600 text-sm">10 roles · 45 days</p>
+          <p class="text-3xl font-bold mt-3">RM 1199</p>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2">
+            <li>Max distribution</li><li>3 boosts</li><li>ATS Lite</li></ul>
+          <button class="mt-auto px-4 py-2 rounded-xl bg-slate-900 text-white" onclick="App.openPostJob('Pro')">Choose plan</button>
+        </div>
+        <div class="p-5 bg-white rounded-2xl border border-slate-200 flex flex-col">
+          <h3 class="font-semibold">Enterprise</h3>
+          <p class="text-slate-600 text-sm">Custom · 60 days</p>
+          <p class="text-3xl font-bold mt-3">Talk to us</p>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2">
+            <li>Dedicated manager</li><li>API & SSO</li><li>SLAs</li></ul>
+          <button class="mt-auto px-4 py-2 rounded-xl border border-slate-200" onclick="alert('We will contact you shortly. (Prototype)')">Contact sales</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Slide-over: Job Details -->
+  <div id="drawer" class="fixed inset-0 hidden" aria-hidden="true">
+    <div class="absolute inset-0 bg-black/40" onclick="App.closeDrawer()"></div>
+    <aside id="drawerPanel" class="absolute top-20 right-0 h-full w-full sm:w-[540px] bg-white shadow-2xl rounded-l-3xl p-6 slide-enter">
+      <button class="absolute right-4 top-4 p-2 rounded-full hover:bg-slate-100" onclick="App.closeDrawer()" aria-label="Close details"><i data-lucide="x"></i></button>
+      <div id="drawerContent" class="space-y-4"></div>
+    </aside>
+  </div>
+
+  <!-- Modal: Post a Job (3 steps) -->
+  <div id="postJob" class="fixed inset-0 hidden z-40">
+    <div class="absolute inset-0 bg-black/40" onclick="App.closePostJob()"></div>
+    <div class="absolute inset-x-0 top-10 mx-auto max-w-2xl bg-white rounded-3xl shadow-2xl p-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold">Post a Job</h3>
+        <button class="p-2 rounded-full hover:bg-slate-100" onclick="App.closePostJob()" aria-label="Close"><i data-lucide="x"></i></button>
+      </div>
+      <ol class="flex items-center gap-2 mt-3 text-sm" id="jobStepper"></ol>
+      <form id="postJobForm" class="mt-4 space-y-4" onsubmit="App.submitJob(event)"></form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-16 border-t border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-sm text-slate-600 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+      <p>© 2025 Jobstore by Bahrincode</p>
+      <nav class="flex gap-4">
+        <a href="#" class="hover:underline" onclick="App.show('employers')">Employers</a>
+        <a href="#" class="hover:underline" onclick="App.show('pricing')">Pricing</a>
+        <a href="#" class="hover:underline" onclick="App.show('saved')">Saved</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+  // ----- Mock Data -----
+  const JOBS = [
+    { id: 1, title: 'Admin Assistant', company: 'Kopi Gayat', city: 'Kota Kinabalu', type: 'Full-time', postedDays: 1, salaryMin: 2200, salaryMax: 3000, tags: ['Fresh Grad'], desc: 'Handle daily office tasks, filing, and basic bookkeeping.', remote: false },
+    { id: 2, title: 'Retail Associate', company: 'UMS HUB Mart', city: 'Kota Kinabalu', type: 'Part-time', postedDays: 0, salaryMin: 10, salaryMax: 15, tags: ['Part-time'], desc: 'Assist customers, manage POS, restock shelves.', remote: false, hourly: true },
+    { id: 3, title: 'IT Support Executive', company: 'NovaTech Engineering', city: 'Kuala Lumpur', type: 'Full-time', postedDays: 2, salaryMin: 3500, salaryMax: 5000, tags: ['Remote'], desc: 'Provide L1/L2 support, manage helpdesk tickets, basic networking.', remote: true },
+    { id: 4, title: 'Accountant', company: 'Jariah Care', city: 'Kota Kinabalu', type: 'Contract', postedDays: 5, salaryMin: 4500, salaryMax: 6000, tags: ['High Salary'], desc: 'Prepare financial statements, manage AP/AR, liaise with auditors.', remote: false },
+    { id: 5, title: 'Graphic Designer', company: 'Jobstore Studio', city: 'Remote (MY)', type: 'Full-time', postedDays: 0, salaryMin: 3800, salaryMax: 5200, tags: ['Remote'], desc: 'Create marketing assets, brand collateral, and UI visuals.', remote: true },
+    { id: 6, title: 'Software Engineer Intern', company: 'Perbadanan Baitulmal Sabah', city: 'Kota Kinabalu', type: 'Internship', postedDays: 3, salaryMin: 1000, salaryMax: 1200, tags: ['Fresh Grad', 'Internship'], desc: 'Assist in system development, testing, and documentation.', remote: false },
+    { id: 7, title: 'Barista', company: 'Kopi Gayat', city: 'Kota Kinabalu', type: 'Full-time', postedDays: 6, salaryMin: 2000, salaryMax: 2800, tags: ['Part-time'], desc: 'Craft coffee beverages and deliver great service.', remote: false },
+  ];
+
+  // ----- State -----
+  const State = {
+    view: 'home',
+    q: '',
+    loc: '',
+    filters: { types: new Set(), exp: new Set(), posted: '', salaryMin: '', salaryMax: '' },
+    page: 1,
+    pageSize: 6,
+    saved: new Set(JSON.parse(localStorage.getItem('saved_jobs') || '[]')),
+  };
+
+  // ----- App Methods -----
+  const App = {
+    show(view){
+      State.view = view;
+      for (const el of document.querySelectorAll('[id^="view-"]')) el.classList.add('hidden');
+      document.getElementById(`view-${view}`).classList.remove('hidden');
+      if(view==='results') this.renderResults();
+      if(view==='saved') this.renderSaved();
+      if(view==='home') this.renderFresh();
+      this.updateNav();
+    },
+    updateNav(){
+      // Optional active states can be added here
+    },
+    search(e){
+      if (e) e.preventDefault();
+      const q = (document.getElementById('q').value || '').trim();
+      const loc = (document.getElementById('loc').value || '').trim();
+      State.q = q; State.loc = loc; State.page = 1;
+      document.getElementById('resultsTitle').textContent = q ? `Results for "${q}"` : 'Search results';
+      this.show('results');
+    },
+    quick(term){ document.getElementById('q').value = term; this.search(); },
+    filterTag(tag){ State.q = tag; document.getElementById('q').value = tag; this.show('results'); },
+    applyFilters(){
+      State.filters.posted = document.getElementById('postedFilter').value;
+      State.filters.salaryMin = document.getElementById('salaryMin').value;
+      State.filters.salaryMax = document.getElementById('salaryMax').value;
+      this.renderResults();
+    },
+    resetFilters(){
+      State.filters = { types: new Set(), exp: new Set(), posted: '', salaryMin: '', salaryMax: '' };
+      document.getElementById('postedFilter').value = '';
+      document.getElementById('salaryMin').value = '';
+      document.getElementById('salaryMax').value = '';
+      for(const btn of document.querySelectorAll('[data-filter]')) btn.classList.remove('bg-slate-900','text-white');
+      this.renderResults();
+    },
+    togglePill(el, set, value){
+      if(set.has(value)){ set.delete(value); el.classList.remove('bg-slate-900','text-white'); }
+      else { set.add(value); el.classList.add('bg-slate-900','text-white'); }
+      this.renderResults();
+    },
+    filteredJobs(){
+      let list = [...JOBS];
+      const { q, loc, filters } = State;
+      if(q) list = list.filter(j => (j.title + ' ' + j.company + ' ' + j.tags.join(' ')).toLowerCase().includes(q.toLowerCase()));
+      if(loc) list = list.filter(j => j.city.toLowerCase().includes(loc.toLowerCase()));
+      if(filters.types.size) list = list.filter(j => filters.types.has(j.type));
+      if(filters.posted) list = list.filter(j => j.postedDays <= +filters.posted);
+      if(filters.salaryMin) list = list.filter(j => (j.hourly ? j.salaryMin : j.salaryMin) >= +filters.salaryMin);
+      if(filters.salaryMax) list = list.filter(j => (j.hourly ? j.salaryMax : j.salaryMax) <= +filters.salaryMax);
+      return list;
+    },
+    renderResults(){
+      const list = this.filteredJobs();
+      const sort = document.getElementById('sort').value;
+      if(sort==='newest') list.sort((a,b)=>a.postedDays-b.postedDays);
+      if(sort==='salary-desc') list.sort((a,b)=> (b.salaryMax||0)-(a.salaryMax||0));
+      if(sort==='salary-asc') list.sort((a,b)=> (a.salaryMin||0)-(b.salaryMin||0));
+
+      document.getElementById('resultsCount').textContent = `${list.length} jobs`;
+      const start = (State.page-1)*State.pageSize;
+      const pageItems = list.slice(start, start+State.pageSize);
+      const container = document.getElementById('resultsList');
+      container.innerHTML = '';
+      for(const j of pageItems){ container.appendChild(this.jobCard(j)); }
+      document.getElementById('pageInfo').textContent = `Page ${State.page} of ${Math.max(1, Math.ceil(list.length/State.pageSize))}`;
+    },
+    nextPage(){
+      const total = Math.ceil(this.filteredJobs().length/State.pageSize) || 1;
+      if(State.page < total){ State.page++; this.renderResults(); }
+    },
+    prevPage(){ if(State.page>1){ State.page--; this.renderResults(); } },
+    jobCard(j){
+      const el = document.createElement('article');
+      el.className = 'p-4 bg-white rounded-2xl border border-slate-200 hover:shadow-md transition';
+      el.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="h-10 w-10 rounded-xl bg-slate-900 text-white grid place-items-center text-sm font-bold">${j.company.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
+          <div class="flex-1">
+            <h3 class="font-semibold text-slate-900">${j.title}</h3>
+            <p class="text-sm text-slate-600">${j.company} • ${j.city} • ${j.type}</p>
+            <p class="text-sm mt-1">${j.hourly? 'RM'+j.salaryMin+'–'+j.salaryMax+'/hr' : 'RM '+j.salaryMin.toLocaleString()+' – '+j.salaryMax.toLocaleString()}</p>
+            <div class="flex flex-wrap gap-2 mt-2">${j.tags.map(t=>`<span class='px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs'>${t}</span>`).join('')}</div>
+          </div>
+          <div class="flex flex-col items-end gap-2">
+            <button class="px-3 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-700" onclick="App.openJob(${j.id})">View</button>
+            <button class="px-2 py-1 rounded-lg border border-slate-200 text-sm" onclick="App.toggleSave(${j.id}, this)">${State.saved.has(j.id)?'Saved':'Save'}</button>
+          </div>
+        </div>`;
+      return el;
+    },
+    openJob(id){
+      const j = JOBS.find(x=>x.id===id);
+      const panel = document.getElementById('drawerPanel');
+      const c = document.getElementById('drawerContent');
+      c.innerHTML = `
+        <div class="flex items-start gap-3">
+          <div class="h-12 w-12 rounded-2xl bg-slate-900 text-white grid place-items-center text-sm font-bold">${j.company.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
+          <div>
+            <h3 class="text-xl font-semibold">${j.title}</h3>
+            <p class="text-slate-600">${j.company} • ${j.city} • ${j.type}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 text-sm text-slate-600">
+          <span class="inline-flex items-center gap-1"><i data-lucide="calendar"></i> Posted ${j.postedDays===0?'today':j.postedDays+'d ago'}</span>
+          <span class="inline-flex items-center gap-1"><i data-lucide="badge-dollar-sign"></i> ${j.hourly? 'RM'+j.salaryMin+'–'+j.salaryMax+'/hr' : 'RM '+j.salaryMin.toLocaleString()+' – '+j.salaryMax.toLocaleString()}</span>
+        </div>
+        <div class="prose max-w-none">
+          <h4 class="font-semibold mt-4">About the role</h4>
+          <p>${j.desc}</p>
+          <h4 class="font-semibold mt-4">Requirements</h4>
+          <ul class="list-disc pl-6">
+            <li>Good communication skills</li>
+            <li>Basic computer literacy</li>
+            <li>Right to work in Malaysia</li>
+          </ul>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-4 py-2 rounded-xl bg-brand-600 text-white" onclick="alert('Application submitted (prototype)')">Quick Apply</button>
+          <button class="px-4 py-2 rounded-xl border border-slate-200" onclick="App.toggleSave(${j.id}, this)">${State.saved.has(j.id)?'Saved':'Save'}</button>
+        </div>`;
+      document.getElementById('drawer').classList.remove('hidden');
+      panel.classList.remove('slide-exit','slide-exit-active');
+      panel.classList.add('slide-enter-active');
+      lucide.createIcons();
+    },
+    closeDrawer(){
+      const panel = document.getElementById('drawerPanel');
+      panel.classList.remove('slide-enter-active');
+      panel.classList.add('slide-exit-active');
+      setTimeout(()=>document.getElementById('drawer').classList.add('hidden'), 180);
+    },
+    toggleSave(id, btn){
+      if(State.saved.has(id)) State.saved.delete(id); else State.saved.add(id);
+      localStorage.setItem('saved_jobs', JSON.stringify([...State.saved]));
+      if(btn) btn.textContent = State.saved.has(id) ? 'Saved' : 'Save';
+      this.renderSaved();
+    },
+    renderSaved(){
+      const list = JOBS.filter(j=>State.saved.has(j.id));
+      const el = document.getElementById('savedList');
+      const empty = document.getElementById('savedEmpty');
+      el.innerHTML = '';
+      list.forEach(j=> el.appendChild(this.jobCard(j)));
+      empty.classList.toggle('hidden', list.length>0);
+    },
+    renderFresh(){
+      const el = document.getElementById('freshList');
+      el.innerHTML = '';
+      JOBS.slice(0,4).forEach(j=>{
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between';
+        li.innerHTML = `<span>${j.title} • <span class='text-slate-600'>${j.company}</span></span>
+                        <button class='text-brand-600 hover:underline' onclick='App.openJob(${j.id})'>View</button>`;
+        el.appendChild(li);
+      });
+    },
+    buildFilterPills(){
+      const types = ['Full-time','Part-time','Contract','Internship'];
+      const exps = ['Fresh Grad','1-3 yrs','3-5 yrs','5+ yrs'];
+      const typeWrap = document.getElementById('typeFilters');
+      const expWrap = document.getElementById('expFilters');
+      typeWrap.innerHTML = expWrap.innerHTML = '';
+      types.forEach(t=>{
+        const b = document.createElement('button');
+        b.type='button'; b.textContent=t; b.className='px-3 py-1.5 rounded-full border border-slate-200 text-sm';
+        b.dataset.filter='type';
+        b.onclick = ()=> this.togglePill(b, State.filters.types, t);
+        typeWrap.appendChild(b);
+      });
+      exps.forEach(t=>{
+        const b = document.createElement('button');
+        b.type='button'; b.textContent=t; b.className='px-3 py-1.5 rounded-full border border-slate-200 text-sm';
+        b.dataset.filter='exp';
+        b.onclick = ()=> this.togglePill(b, State.filters.exp, t);
+        expWrap.appendChild(b);
+      });
+    },
+    // Post a Job modal logic
+    openPostJob(plan){
+      document.getElementById('postJob').classList.remove('hidden');
+      this.postJobStep = 0;
+      this.postData = { plan: plan || 'Standard' };
+      this.renderPostJob();
+    },
+    closePostJob(){ document.getElementById('postJob').classList.add('hidden'); },
+    renderPostJob(){
+      const steps = ['Basics','Details','Publish'];
+      const stepper = document.getElementById('jobStepper');
+      stepper.innerHTML = '';
+      steps.forEach((s,i)=>{
+        const li = document.createElement('li');
+        li.className = 'flex-1 flex items-center gap-2';
+        li.innerHTML = `<div class='h-7 w-7 grid place-items-center rounded-full ${i<=this.postJobStep?'bg-brand-600 text-white':'bg-slate-200 text-slate-700'}'>${i+1}</div><span class='${i===this.postJobStep?'font-semibold':''}'>${s}</span>`;
+        stepper.appendChild(li);
+      });
+      const form = document.getElementById('postJobForm');
+      if(this.postJobStep===0){
+        form.innerHTML = `
+          <label class='block'>
+            <span class='text-sm text-slate-600'>Job title</span>
+            <input required id='pj_title' class='mt-1 w-full h-11 rounded-xl border border-slate-200 px-3'>
+          </label>
+          <div class='grid sm:grid-cols-2 gap-3'>
+            <label class='block'>
+              <span class='text-sm text-slate-600'>Location</span>
+              <input required id='pj_loc' class='mt-1 w-full h-11 rounded-xl border border-slate-200 px-3'>
+            </label>
+            <label class='block'>
+              <span class='text-sm text-slate-600'>Type</span>
+              <select id='pj_type' class='mt-1 w-full h-11 rounded-xl border border-slate-200 px-3'>
+                <option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option>
+              </select>
+            </label>
+          </div>
+          <div class='flex justify-between'>
+            <span class='text-sm text-slate-600'>Plan: <b>${this.postData.plan}</b></span>
+            <button type='button' class='px-4 py-2 rounded-xl bg-slate-900 text-white' onclick='App.nextPostStep()'>Next</button>
+          </div>`;
+      } else if(this.postJobStep===1){
+        form.innerHTML = `
+          <label class='block'>
+            <span class='text-sm text-slate-600'>Description</span>
+            <textarea id='pj_desc' rows='5' class='mt-1 w-full rounded-xl border border-slate-200 px-3 py-2'></textarea>
+          </label>
+          <div class='grid sm:grid-cols-2 gap-3'>
+            <label class='block'>
+              <span class='text-sm text-slate-600'>Salary Min (MYR)</span>
+              <input id='pj_min' type='number' class='mt-1 w-full h-11 rounded-xl border border-slate-200 px-3'>
+            </label>
+            <label class='block'>
+              <span class='text-sm text-slate-600'>Salary Max (MYR)</span>
+              <input id='pj_max' type='number' class='mt-1 w-full h-11 rounded-xl border border-slate-200 px-3'>
+            </label>
+          </div>
+          <div class='flex justify-between'>
+            <button type='button' class='px-4 py-2 rounded-xl border border-slate-200' onclick='App.prevPostStep()'>Back</button>
+            <button type='button' class='px-4 py-2 rounded-xl bg-slate-900 text-white' onclick='App.nextPostStep()'>Next</button>
+          </div>`;
+      } else {
+        form.innerHTML = `
+          <div class='p-4 rounded-2xl bg-slate-50 border border-slate-200'>
+            <p class='font-semibold'>Preview</p>
+            <p id='pj_preview' class='text-sm text-slate-700 mt-1'>Your job post is almost ready.</p>
+          </div>
+          <div class='flex justify-between'>
+            <button type='button' class='px-4 py-2 rounded-xl border border-slate-200' onclick='App.prevPostStep()'>Back</button>
+            <button class='px-4 py-2 rounded-xl bg-brand-600 text-white'>Publish</button>
+          </div>`;
+        // Preview text
+        const t = document.getElementById('pj_title')?.value || 'Job Title';
+        const l = document.getElementById('pj_loc')?.value || 'Location';
+        const ty = document.getElementById('pj_type')?.value || 'Full-time';
+        const mi = document.getElementById('pj_min')?.value || '—';
+        const ma = document.getElementById('pj_max')?.value || '—';
+        document.getElementById('pj_preview').textContent = `${t} • ${ty} • ${l} — RM ${mi} – ${ma}`;
+      }
+      lucide.createIcons();
+    },
+    nextPostStep(){ this.postJobStep=Math.min(2,(this.postJobStep||0)+1); this.renderPostJob(); },
+    prevPostStep(){ this.postJobStep=Math.max(0,(this.postJobStep||0)-1); this.renderPostJob(); },
+    submitJob(e){ e.preventDefault(); alert('Job published! (Prototype)'); this.closePostJob(); },
+  };
+
+  // ----- Init -----
+  document.addEventListener('DOMContentLoaded', () => {
+    App.buildFilterPills();
+    App.renderFresh();
+    App.show('home');
+    lucide.createIcons();
+    document.getElementById('searchFormHome').addEventListener('submit', App.search.bind(App));
+  });
+  </script>
+</body>
+</html>
