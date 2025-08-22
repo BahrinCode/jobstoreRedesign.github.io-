@@ -1,4 +1,4 @@
-#Jobstore.com Redesign
+#Jobstore.com-Redesign-
 
 This repository contains a redesigned prototype of Jobstore.com, built with pure HTML, CSS, and JavaScript. The redesign focuses on improving job seeker discovery and employer engagement with a modern, clean, and responsive layout.
 
